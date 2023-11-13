@@ -80,6 +80,7 @@ export default class {
     $("#arrow-icon1").click((e) => this.handleShowTickets(e, bills, 1));
     $("#arrow-icon2").click((e) => this.handleShowTickets(e, bills, 2));
     $("#arrow-icon3").click((e) => this.handleShowTickets(e, bills, 3));
+
     new Logout({ localStorage, onNavigate });
   }
 
@@ -95,42 +96,10 @@ export default class {
       $("#modaleFileAdmin1").modal("show");
   };
 
-  //Wrong version
-  // handleEditTicket(e, bill, bills) {
-  //   if (this.counter === undefined || this.id !== bill.id) this.counter = 0;
-  //   if (this.id === undefined || this.id !== bill.id) this.id = bill.id;
-  //   if (this.counter % 2 === 0) {
-  //     console.log("yes :" + this.counter);
-  //     bills.forEach((b) => {
-  //       $(`#open-bill${b.id}`).css({ background: "#0D5AE5" });
-  //     });
-  //     $(`#open-bill${bill.id}`).css({ background: "#2A2B35" });
-  //     $(".dashboard-right-container div").html(DashboardFormUI(bill));
-  //     $(".vertical-navbar").css({ height: "150vh" });
-  //     this.counter++;
-  //   } else {
-  //     console.log(" no :" + this.counter);
-  //     $(`#open-bill${bill.id}`).css({ background: "#0D5AE5" });
-
-  //     $(".dashboard-right-container div").html(`
-  //       <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
-  //     `);
-  //     $(".vertical-navbar").css({ height: "120vh" });
-  //     this.counter++;
-  //   }
-  //   $("#icon-eye-d").click(this.handleClickIconEye);
-  //   $("#btn-accept-bill").click((e) => this.handleAcceptSubmit(e, bill));
-  //   $("#btn-refuse-bill").click((e) => this.handleRefuseSubmit(e, bill));
-  // }
-
-  //Correct version
-
-  //if (this.counter % 2 === 0)
   handleEditTicket(e, bill, bills) {
-    console.log(this.counter);
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0;
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id;
-    if (this.counter >= 0) {
+    if (this.counter % 2 === 0) {
       bills.forEach((b) => {
         $(`#open-bill${b.id}`).css({ background: "#0D5AE5" });
       });
@@ -142,29 +111,15 @@ export default class {
       $(`#open-bill${bill.id}`).css({ background: "#0D5AE5" });
 
       $(".dashboard-right-container div").html(`
-          <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
-        `);
+        <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
+      `);
       $(".vertical-navbar").css({ height: "120vh" });
       this.counter++;
     }
-
     $("#icon-eye-d").click(this.handleClickIconEye);
     $("#btn-accept-bill").click((e) => this.handleAcceptSubmit(e, bill));
     $("#btn-refuse-bill").click((e) => this.handleRefuseSubmit(e, bill));
   }
-
-  ///Test version réduite
-  // handleEditTicket(e, bill, bills) {
-  //   bills.forEach((b) => {
-  //     $(`#open-bill${b.id}`).css({ background: "#0D5AE5" });
-  //   });
-  //   $(`#open-bill${bill.id}`).css({ background: "#2A2B35" });
-  //   $(".dashboard-right-container div").html(DashboardFormUI(bill));
-  //   $(".vertical-navbar").css({ height: "150vh" });
-  //   $("#icon-eye-d").click(this.handleClickIconEye);
-  //   $("#btn-accept-bill").click((e) => this.handleAcceptSubmit(e, bill));
-  //   $("#btn-refuse-bill").click((e) => this.handleRefuseSubmit(e, bill));
-  // }
 
   handleAcceptSubmit = (e, bill) => {
     const newBill = {
@@ -201,11 +156,20 @@ export default class {
       this.counter++;
     }
 
+    ////Old version
+    // bills.forEach((bill) => {
+    //   $(`#open-bill${bill.id}`).click((e) =>
+    //     this.handleEditTicket(e, bill, bills)
+    //   );
+    // });
+
+    ////Correct version
     bills.forEach((bill) => {
-      $(`#open-bill${bill.id}`).click((e) =>
-        this.handleEditTicket(e, bill, bills)
-      );
+      $(`#open-bill${bill.id}`)
+        .off("click")
+        .on("click", (e) => this.handleEditTicket(e, bill, bills));
     });
+    ////
 
     return bills;
   }
@@ -233,6 +197,7 @@ export default class {
   // not need to cover this function by tests
   /* istanbul ignore next */
   updateBill = (bill) => {
+    console.log("update");
     if (this.store) {
       return this.store
         .bills()
