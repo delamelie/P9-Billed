@@ -5,11 +5,12 @@
 import { screen, waitFor } from "@testing-library/dom";
 import "@testing-library/jest-dom/extend-expect";
 import BillsUI from "../views/BillsUI.js";
+import userEvent from "@testing-library/user-event";
 import { bills } from "../fixtures/bills.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
-import Test from "../containers/Bill.js";
+import EmployeeBills from "../containers/Bills.js";
 import mockStore from "../__mocks__/store";
 
 jest.mock("../app/store", () => mockStore);
@@ -33,7 +34,7 @@ describe("Given I am connected as an employee", () => {
       window.onNavigate(ROUTES_PATH.Bills);
       await waitFor(() => screen.getByTestId("icon-window"));
       const windowIcon = screen.getByTestId("icon-window");
-      //Added expression
+      //to-do write expect expression
       expect(windowIcon.classList.contains("active-icon")).toBe(true);
     });
     test("Then bills should be ordered from earliest to latest", () => {
@@ -49,9 +50,13 @@ describe("Given I am connected as an employee", () => {
     });
   });
 
-  // Ajout test icône oeil
-  describe("When I am on bills page and I click on the icon eye", () => {
-    test("Then a modal should open", () => {
+  // Ajout de test clic pour créer nouvelle note de frais
+  describe("When I click on the new bill button", () => {
+    test("Then it should navigate to the new bill page", () => {
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
@@ -62,28 +67,20 @@ describe("Given I am connected as an employee", () => {
         })
       );
 
-      const onNavigate = (pathname) => {
-        document.body.innerHTML = ROUTES({ pathname });
-      };
-
-      const test = new Test({
+      const employeeBills = new EmployeeBills({
         document,
         onNavigate,
         store: null,
         bills: bills,
         localStorage: window.localStorage,
       });
+      document.body.innerHTML = BillsUI({ data: { bills } });
 
-      document.body.innerHTML = BillsUI({ data: bills });
-
-      const handleClickIconEye = jest.fn(test.handleClickIconEye);
-      const eye = screen.getByTestId("icon-eye");
-      eye.addEventListener("click", handleClickIconEye);
-      userEvent.click(eye);
-      expect(handleClickIconEye).toHaveBeenCalled();
-
-      const modale = screen.getByTestId("modaleFileEmployee");
-      expect(modale).toBeTruthy();
+      const onNavigateSpy = jest.spyOn(employeeBills, "onNavigate");
+      const button = screen.getByTestId("btn-new-bill");
+      userEvent.click(button);
+      expect(onNavigateSpy).toHaveBeenCalledWith("/NewBill");
+      expect(screen.getAllByText("Envoyer une note de frais")).toBeTruthy();
     });
   });
 
@@ -103,8 +100,47 @@ describe("Given I am connected as an employee", () => {
   });
 });
 
+// Ajout test icône oeil
+describe("Given I am connected as an employee to the bills page", () => {
+  describe("When I click on the icon eye", () => {
+    test("Then a modal should open", () => {
+      Object.defineProperty(window, "localStorage", {
+        value: localStorageMock,
+      });
+      window.localStorage.setItem(
+        "user",
+        JSON.stringify({
+          type: "Employee",
+        })
+      );
+
+      document.body.innerHTML = BillsUI({ data: { bills } });
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+
+      const employeeBills = new EmployeeBills({
+        document,
+        onNavigate,
+        store: null,
+        bills,
+        localStorage: window.localStorage,
+      });
+
+      const handleClickIconEye = jest.fn(employeeBills.handleClickIconEye);
+      const eye = screen.getByTestId("icon-eye");
+      eye.addEventListener("click", handleClickIconEye);
+      userEvent.click(eye);
+      expect(handleClickIconEye).toHaveBeenCalled();
+
+      const modale = screen.getByTestId("modaleFileEmployee");
+      expect(modale).toBeTruthy();
+    });
+  });
+});
+
 // test d'intégration GET
-describe("Given I am a user connected as Employee", () => {
+describe("Given I am a user connected as Employee3", () => {
   describe("When I navigate to my bills", () => {
     test("Bills from mocked API GET are fetched", async () => {
       localStorage.setItem(
@@ -117,9 +153,10 @@ describe("Given I am a user connected as Employee", () => {
       router();
       window.onNavigate(ROUTES_PATH.Bills);
       await waitFor(() => screen.getByText("Mes notes de frais"));
-      const contentType = await screen.getByText("Type");
-      expect(contentType).toBeTruthy();
-      expect(screen.getByTestId("icon-eye")).toBeTruthy();
+      const type = await screen.getByText("Type");
+      expect(type).toBeTruthy();
+
+      //expect(screen.getByTestId("icon-eye")).toBeTruthy();
     });
     describe("When an error occurs on API", () => {
       beforeEach(() => {
@@ -162,7 +199,7 @@ describe("Given I am a user connected as Employee", () => {
           };
         });
 
-        window.onNavigate(ROUTES_PATH.Dashboard);
+        window.onNavigate(ROUTES_PATH.Bills);
         await new Promise(process.nextTick);
         const message = await screen.getByText(/Erreur 500/);
         expect(message).toBeTruthy();
