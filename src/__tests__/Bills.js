@@ -5,12 +5,13 @@
 import { screen, waitFor } from "@testing-library/dom";
 import "@testing-library/jest-dom/extend-expect";
 import BillsUI from "../views/BillsUI.js";
+
 import userEvent from "@testing-library/user-event";
 import { bills } from "../fixtures/bills.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
-import EmployeeBills from "../containers/Bills.js";
+import Bills from "../containers/Bills.js";
 import mockStore from "../__mocks__/store";
 
 jest.mock("../app/store", () => mockStore);
@@ -37,6 +38,7 @@ describe("Given I am connected as an employee", () => {
       //to-do write expect expression
       expect(windowIcon.classList.contains("active-icon")).toBe(true);
     });
+
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills });
       const dates = screen
@@ -47,6 +49,21 @@ describe("Given I am connected as an employee", () => {
       const antiChrono = (a, b) => (a < b ? 1 : -1);
       const datesSorted = [...dates].sort(antiChrono);
       expect(dates).toEqual(datesSorted);
+    });
+  });
+
+  // Ajout de test error et loading
+  describe("When I am on Bills page but it is loading", () => {
+    test("Then, Loading page should be rendered", () => {
+      document.body.innerHTML = BillsUI({ loading: true });
+      expect(screen.getAllByText("Loading...")).toBeTruthy();
+    });
+  });
+
+  describe("When I am on Bills page but back-end sends an error message", () => {
+    test("Then, Error page should be rendered", () => {
+      document.body.innerHTML = BillsUI({ error: "some error message" });
+      expect(screen.getAllByText("Erreur")).toBeTruthy();
     });
   });
 
@@ -67,7 +84,7 @@ describe("Given I am connected as an employee", () => {
         })
       );
 
-      const employeeBills = new EmployeeBills({
+      const employeeBills = new Bills({
         document,
         onNavigate,
         store: null,
@@ -81,21 +98,6 @@ describe("Given I am connected as an employee", () => {
       userEvent.click(button);
       expect(onNavigateSpy).toHaveBeenCalledWith("/NewBill");
       expect(screen.getAllByText("Envoyer une note de frais")).toBeTruthy();
-    });
-  });
-
-  // Ajout de test error et loading
-  describe("When I am on Bills page but it is loading", () => {
-    test("Then, Loading page should be rendered", () => {
-      document.body.innerHTML = BillsUI({ loading: true });
-      expect(screen.getAllByText("Loading...")).toBeTruthy();
-    });
-  });
-
-  describe("When I am on Bills page but back-end send an error message", () => {
-    test("Then, Error page should be rendered", () => {
-      document.body.innerHTML = BillsUI({ error: "some error message" });
-      expect(screen.getAllByText("Erreur")).toBeTruthy();
     });
   });
 });
@@ -119,7 +121,7 @@ describe("Given I am connected as an employee to the bills page", () => {
         document.body.innerHTML = ROUTES({ pathname });
       };
 
-      const employeeBills = new EmployeeBills({
+      const employeeBills = new Bills({
         document,
         onNavigate,
         store: null,
@@ -156,7 +158,7 @@ describe("Given I am a user connected as Employee3", () => {
       const type = await screen.getByText("Type");
       expect(type).toBeTruthy();
 
-      //expect(screen.getByTestId("icon-eye")).toBeTruthy();
+      expect(screen.getByTestId("tbody")).toBeTruthy();
     });
     describe("When an error occurs on API", () => {
       beforeEach(() => {

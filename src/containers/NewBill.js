@@ -1,7 +1,7 @@
 import { ROUTES_PATH } from "../constants/routes.js";
 import Logout from "./Logout.js";
 
-////Ajout de regex pour vérifier que le fichier téléchargé ait une des trois extensions autorisées
+////Add regex to check file extension
 const validFileExtension = /\b(?:jpg|jpeg|png)$/gm;
 
 export default class NewBill {
@@ -26,14 +26,15 @@ export default class NewBill {
     const file = this.document.querySelector(`input[data-testid="file"]`)
       .files[0];
     console.log(file.name);
+    console.log(file);
+    const filePath = e.target.value.split(/\\/g);
+    const fileName = filePath[filePath.length - 1];
+    const formData = new FormData();
+    const email = JSON.parse(localStorage.getItem("user")).email;
+    formData.append("file", file);
+    formData.append("email", email);
     ////Condition de vérification de l'extension du fichier
     if (file.name.match(validFileExtension)) {
-      const filePath = e.target.value.split(/\\/g);
-      const fileName = filePath[filePath.length - 1];
-      const formData = new FormData();
-      const email = JSON.parse(localStorage.getItem("user")).email;
-      formData.append("file", file);
-      formData.append("email", email);
       this.store
         .bills()
         .create({
@@ -57,6 +58,7 @@ export default class NewBill {
   handleSubmit = (e) => {
     e.preventDefault();
     console.log("submit");
+
     console.log(
       'e.target.querySelector(`input[data-testid="datepicker"]`).value',
       e.target.querySelector(`input[data-testid="datepicker"]`).value
@@ -85,6 +87,7 @@ export default class NewBill {
   };
 
   ////not need to cover this function by tests
+
   updateBill = (bill) => {
     console.log("update");
     if (this.store) {

@@ -29,6 +29,17 @@ const rows = (data) => {
     : "";
 };
 
+// const rows = (data) => {
+//   return data && data.length
+//     ? data
+//         .sort((a, b) => (a.date > b.date ? 1 : -1))
+//         .map((bill) => {
+//           return row(bill);
+//         })
+//         .join("")
+//     : "";
+// };
+
 ///////////
 
 ////// Bug corrigé
