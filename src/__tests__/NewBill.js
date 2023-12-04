@@ -22,7 +22,7 @@ const fileName = [
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on bills page", () => {
-    test("Then bill icon in vertical layout should be highlighted", async () => {
+    test("Then mail icon in vertical layout should be highlighted", async () => {
       Object.defineProperty(window, "localStorage", {
         value: localStorageMock,
       });
