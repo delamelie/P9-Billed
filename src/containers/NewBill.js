@@ -33,7 +33,7 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email;
     formData.append("file", file);
     formData.append("email", email);
-    ////Condition de vérification de l'extension du fichier
+    //Condition de vérification de l'extension du fichier
     if (file.name.match(validFileExtension)) {
       this.store
         .bills()
@@ -82,6 +82,7 @@ export default class NewBill {
       fileName: this.fileName,
       status: "pending",
     };
+
     this.updateBill(bill);
     this.onNavigate(ROUTES_PATH["Bills"]);
   };

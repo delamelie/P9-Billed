@@ -66,20 +66,24 @@ describe("Given I am connected as an employee", () => {
   });
 
   describe("When I am on Bills page but it is loading", () => {
-    test("Then, Loading page should be rendered", () => {
+    test("Then loading page should be rendered", () => {
       document.body.innerHTML = BillsUI({ loading: true });
       expect(screen.getAllByText("Loading...")).toBeTruthy();
     });
   });
 
   describe("When I am on Bills page but back-end sends an error message", () => {
-    test("Then, Error page should be rendered", () => {
+    test("Then error page should be rendered", () => {
       document.body.innerHTML = BillsUI({ error: "some error message" });
       expect(screen.getAllByText("Erreur")).toBeTruthy();
     });
   });
 
-  describe("When I click on the icon eye", () => {
+  describe("When I click on the eye icon", () => {
+    beforeEach(() => {
+      $.fn.modal = jest.fn();
+    });
+
     const employeeBills = new Bills({
       document,
       onNavigate,
@@ -88,10 +92,6 @@ describe("Given I am connected as an employee", () => {
     });
 
     test("Then a modal should open", () => {
-      ////////////////////
-      $.fn.modal = jest.fn();
-      ///////////////////////////
-
       document.body.innerHTML = BillsUI({ data: bills });
       const handleClickIconEye = jest.fn(employeeBills.handleClickIconEye);
       const eye = screen.getAllByTestId("icon-eye")[0];
@@ -99,8 +99,11 @@ describe("Given I am connected as an employee", () => {
       //eye.addEventListener("click", handleClickIconEye);
       userEvent.click(eye);
       expect(handleClickIconEye).toHaveBeenCalled();
-      const modale = screen.getByTestId("modaleFileEmployee");
+      const modale = document.getElementById("modaleFile");
       expect(modale).toBeTruthy();
+
+      expect(modale).toHaveClass("modal fade show");
+      //expect(modale).toHaveStyle(`display: block`);
     });
 
     describe("When I click on the close button", () => {
@@ -113,7 +116,11 @@ describe("Given I am connected as an employee", () => {
         userEvent.click(close);
         expect(handleCloseModal).toHaveBeenCalled();
         const modale = screen.getByTestId("modaleFileEmployee");
-        expect(modale).not.toBeTruthy();
+        expect(modale).toHaveStyle(`display: none`);
+        // expect(modale).not.toHaveClass("show");
+        // expect(screen.getAllByText("Justificatif")).toBeTruthy();
+
+        // expect(modale.getAttribute("class")).not.toContain("modal fade show");
       });
     });
   });
@@ -130,7 +137,7 @@ describe("Given I am connected as an employee", () => {
       });
 
       const handleClickNewBillButton = jest.fn(
-        employeeBills.handleClickNewBillButton
+        employeeBills.handleClickNewBill
       );
       const button = screen.getByTestId("btn-new-bill");
       //button.addEventListener("click", handleClickNewBillButton);
@@ -144,9 +151,9 @@ describe("Given I am connected as an employee", () => {
 });
 
 // test d'intégration GET
-describe("Given I am a user connected as Employee3", () => {
+describe("Given I am a user connected as an Employee", () => {
   describe("When I navigate to my bills", () => {
-    test("Bills from mocked API GET are fetched", async () => {
+    test("Then bills are fetched from mocked API", async () => {
       localStorage.setItem(
         "user",
         JSON.stringify({ type: "Employee", email: "b@b" })
@@ -161,7 +168,8 @@ describe("Given I am a user connected as Employee3", () => {
       expect(type).toBeTruthy();
       expect(screen.getAllByTestId("tbody")).toBeTruthy();
     });
-    describe("When an error occurs on API", () => {
+
+    describe("When I try to navigate to my bills but an error occurs on API", () => {
       beforeEach(() => {
         jest.spyOn(mockStore, "bills");
         Object.defineProperty(window, "localStorage", {
@@ -179,7 +187,7 @@ describe("Given I am a user connected as Employee3", () => {
         document.body.appendChild(root);
         router();
       });
-      test("fetches bills from an API and fails with 404 message error", async () => {
+      test("Then bill fetching fails with 404 message error", async () => {
         mockStore.bills.mockImplementationOnce(() => {
           return {
             list: () => {
@@ -193,7 +201,7 @@ describe("Given I am a user connected as Employee3", () => {
         expect(message).toBeTruthy();
       });
 
-      test("fetches messages from an API and fails with 500 message error", async () => {
+      test("Then bill fetching fails with 500 message error", async () => {
         mockStore.bills.mockImplementationOnce(() => {
           return {
             list: () => {
