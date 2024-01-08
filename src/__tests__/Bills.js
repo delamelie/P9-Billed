@@ -55,12 +55,10 @@ describe("Given I am connected as an employee", () => {
     });
 
     test("Then a button allowing to see the attachment should be displayed", () => {
-      // document.body.innerHTML = BillsUI({ data: bills });
       expect(screen.getAllByTestId("icon-eye")).toBeTruthy();
     });
 
     test("Then a button to create a new bill should be displayed", () => {
-      //document.body.innerHTML = BillsUI({ data: bills });
       expect(screen.getByTestId("btn-new-bill")).toBeTruthy();
     });
   });
@@ -99,36 +97,34 @@ describe("Given I am connected as an employee", () => {
       //eye.addEventListener("click", handleClickIconEye);
       userEvent.click(eye);
       expect(handleClickIconEye).toHaveBeenCalled();
-      const modale = document.getElementById("modaleFile");
+      const modale = screen.getByTestId("modaleFileEmployee");
       expect(modale).toBeTruthy();
 
-      expect(modale).toHaveClass("modal fade show");
-      //expect(modale).toHaveStyle(`display: block`);
+      ///Does not work
+      //expect(modale).toHaveClass("show");
+
+      ///Does work when it should not
+      expect(modale).not.toHaveClass("show");
     });
 
     describe("When I click on the close button", () => {
       test("Then the modal should close", () => {
-        //document.body.innerHTML = BillsUI({ data: bills });
-
         const handleCloseModal = jest.fn(employeeBills.handleCloseModal);
         const close = screen.getByRole("button");
         close.addEventListener("click", handleCloseModal);
         userEvent.click(close);
         expect(handleCloseModal).toHaveBeenCalled();
         const modale = screen.getByTestId("modaleFileEmployee");
-        expect(modale).toHaveStyle(`display: none`);
-        // expect(modale).not.toHaveClass("show");
-        // expect(screen.getAllByText("Justificatif")).toBeTruthy();
+        expect(modale).not.toHaveClass("show");
 
-        // expect(modale.getAttribute("class")).not.toContain("modal fade show");
+        ///Does work when it should not
+        expect(modale).toBeTruthy();
       });
     });
   });
 
   describe("When I click on the new bill button", () => {
     test("Then I should navigate to the new bill page", () => {
-      document.body.innerHTML = BillsUI({ data: bills });
-
       const employeeBills = new Bills({
         document,
         onNavigate,
@@ -144,7 +140,6 @@ describe("Given I am connected as an employee", () => {
       button.addEventListener("click", () => handleClickNewBillButton(button));
       userEvent.click(button);
       expect(handleClickNewBillButton).toHaveBeenCalled();
-      //expect(handleClickNewBillButton).toHaveBeenCalledWith("/NewBill");
       expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
     });
   });

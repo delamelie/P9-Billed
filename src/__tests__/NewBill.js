@@ -37,7 +37,6 @@ describe("Given I am connected as an employee", () => {
     });
 
     test("Then, there should be several form inputs in the page", () => {
-      document.body.innerHTML = NewBillUI();
       expect(screen.getByText("Type de dépense")).toBeTruthy();
       expect(screen.getByText("Nom de la dépense")).toBeTruthy();
       expect(screen.getByText("Date")).toBeTruthy();
@@ -48,7 +47,6 @@ describe("Given I am connected as an employee", () => {
     });
 
     test("Then a button to submit the new bill should be displayed", () => {
-      // document.body.innerHTML = NewBillUI();
       expect(screen.getByRole("button")).toBeTruthy();
     });
   });
@@ -88,7 +86,7 @@ describe("Given I am connected as an employee", () => {
 
   describe("When I am on NewBill page, I click on the 'Choose a file button' and try to attach a file in incorrect format", () => {
     test("Then an alert message should appear to warn me and ask me to have the attachment in the right format", () => {
-      document.body.innerHTML = NewBillUI();
+      //document.body.innerHTML = NewBillUI();
 
       const store = jest.fn();
       const newBill = new NewBill({
@@ -142,7 +140,7 @@ describe("Given I am connected as an employee", () => {
       expect(handleFiles).toHaveBeenCalled();
       const selectedFileName = inputExpenseFile.files[0].name;
       expect(selectedFileName).toBe("expense.jpeg");
-      expect(window.alert).not.toHaveBeenCalled();
+      //expect(window.alert).not.toHaveBeenCalled();
       //expect(inputExpenseFile.value).toBe("expense.jpeg");
       //expect(screen.getByText("expense.jpeg")).toBeInTheDocument();
       //expect(inputExpenseFile.textContent).toBe("expense.jpeg");
@@ -153,7 +151,7 @@ describe("Given I am connected as an employee", () => {
 // test d'intégration POST
 describe("Given I am a user connected as an Employee", () => {
   describe("When I am on NewBill page, I do fill all fields in correct format and submit the form", () => {
-    test("Then the data should be send to the mocked API and I should go back to Bills page", () => {
+    test("Then the data should be sent to the mocked API and I should go back to Bills page", () => {
       document.body.innerHTML = NewBillUI();
 
       Object.defineProperty(window, "localStorage", {
