@@ -136,8 +136,7 @@ describe("Given I am connected as an employee", () => {
         employeeBills.handleClickNewBill
       );
       const button = screen.getByTestId("btn-new-bill");
-      //button.addEventListener("click", handleClickNewBillButton);
-      button.addEventListener("click", () => handleClickNewBillButton(button));
+      button.addEventListener("click", handleClickNewBillButton);
       userEvent.click(button);
       expect(handleClickNewBillButton).toHaveBeenCalled();
       expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();

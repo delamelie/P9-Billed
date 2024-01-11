@@ -33,7 +33,7 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email;
     formData.append("file", file);
     formData.append("email", email);
-    //Condition de vérification de l'extension du fichier
+    //Add consition to check file extension
     if (file.name.match(validFileExtension)) {
       this.store
         .bills()
@@ -87,7 +87,7 @@ export default class NewBill {
     this.onNavigate(ROUTES_PATH["Bills"]);
   };
 
-  ////not need to cover this function by tests
+  ////no need to cover this function by tests
 
   updateBill = (bill) => {
     console.log("update");
