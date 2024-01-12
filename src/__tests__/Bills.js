@@ -99,13 +99,21 @@ describe("Given I am connected as an employee", () => {
       expect(handleClickIconEye).toHaveBeenCalled();
       const modale = screen.getByTestId("modaleFileEmployee");
       expect(modale).toBeTruthy();
-
+      //expect(screen.getByText("Justificatif")).toBeTruthy();
       ///Does not work
       //expect(modale).toHaveClass("show");
 
       ///Does work when it should not
       expect(modale).not.toHaveClass("show");
     });
+
+    //   test("Then the modal should close", () => {
+    //     const modale = screen.getByTestId("modaleFileEmployee");
+    //     const close = document.querySelector(".close");
+    //     close.addEventListener("click", () => {
+    //       expect(modale).toBeFalsy();
+    //     });
+    //   });
 
     describe("When I click on the close button", () => {
       test("Then the modal should close", () => {
