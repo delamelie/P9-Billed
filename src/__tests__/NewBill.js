@@ -11,6 +11,10 @@ import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import router from "../app/Router.js";
 jest.mock("../app/store", () => mockStore);
 
+// const onNavigate = (pathname) => {
+//   document.body.innerHTML = ROUTES({ pathname });
+// };
+
 describe("Given I am connected as an employee", () => {
   describe("When I am on Newbill page", () => {
     test("Then mail icon in vertical layout should be highlighted", async () => {
@@ -52,7 +56,6 @@ describe("Given I am connected as an employee", () => {
     test("Then the form should not be submitted and I should stay on NewBill page", () => {
       document.body.innerHTML = NewBillUI();
 
-      // does not work if toBe is empty
       const inputExpenseType = screen.getByTestId("expense-type");
       expect(inputExpenseType.value).toBe("Transports");
 
@@ -94,16 +97,16 @@ describe("Given I am connected as an employee", () => {
 
       window.alert = jest.fn();
 
-      const handleFiles = jest.fn(newBill.handleChangeFile);
+      const handleChangeFiles = jest.fn(newBill.handleChangeFile);
       const inputExpenseFile = screen.getByTestId("file");
-      inputExpenseFile.addEventListener("change", handleFiles);
+      inputExpenseFile.addEventListener("change", handleChangeFiles);
 
       const fileName = new File(["bill"], "bill.pdf", {
         type: "application/pdf",
       });
 
       fireEvent.change(inputExpenseFile, { target: { files: [fileName] } });
-      expect(handleFiles).toHaveBeenCalled();
+      expect(handleChangeFiles).toHaveBeenCalled();
       const selectedFileName = inputExpenseFile.files[0].name;
       expect(selectedFileName).toBe("bill.pdf");
       expect(window.alert).toHaveBeenCalled();
@@ -125,16 +128,16 @@ describe("Given I am connected as an employee", () => {
 
       window.alert = jest.fn();
 
-      const handleFiles = jest.fn(newBill.handleChangeFile);
+      const handleChangeFiles = jest.fn(newBill.handleChangeFile);
       const inputExpenseFile = screen.getByTestId("file");
-      inputExpenseFile.addEventListener("change", handleFiles);
+      inputExpenseFile.addEventListener("change", handleChangeFiles);
 
       const fileName = new File(["expense"], "expense.jpeg", {
         type: "image/jpeg",
       });
 
       fireEvent.change(inputExpenseFile, { target: { files: [fileName] } });
-      expect(handleFiles).toHaveBeenCalled();
+      expect(handleChangeFiles).toHaveBeenCalled();
       const selectedFileName = inputExpenseFile.files[0].name;
       expect(selectedFileName).toBe("expense.jpeg");
       expect(window.alert).not.toHaveBeenCalled();
@@ -217,13 +220,13 @@ describe("Given I am a user connected as an Employee", () => {
       });
       expect(inputExpenseComment.value).toBe(newBillDataInput.commentary);
 
-      // const inputExpenseFile = screen.getByTestId("file");
-      // fireEvent.change(inputExpenseFile, {
-      //   target: { files: newBillDataInput.fileName },
-      // });
+      const inputExpenseFile = screen.getByTestId("file");
+      fireEvent.change(inputExpenseFile, {
+        target: { files: newBillDataInput.fileName },
+      });
 
-      // const selectedFileName = inputExpenseFile.files[0].name;
-      // expect(selectedFileName).toBe(newBillDataInput.fileName[0].name);
+      const selectedFileName = inputExpenseFile.files[0].name;
+      expect(selectedFileName).toBe(newBillDataInput.fileName[0].name);
 
       const form = screen.getByTestId("form-new-bill");
 
@@ -288,3 +291,68 @@ describe("Given I am a user connected as an Employee", () => {
     });
   });
 });
+
+//////test/////////
+
+//   describe("when i click on the submit button", () => {
+
+//     test("Then it should send the new bill to the mock API POST and fails with 404 message error", async () => {
+
+//       mockStore.bills.mockImplementationOnce(() => {
+//         return {
+//           create: () =>{
+//             return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'})
+//           },
+//           update : () =>  {
+//             return Promise.reject(new Error("Erreur 404"))
+//           }
+//         }})
+
+//         window.onNavigate(ROUTES_PATH.Bills)
+//         await new Promise(process.nextTick);
+//        const html = BillsUI({ error: "Erreur 404" });
+//        document.body.innerHTML = html;
+//        const message = screen.getByText(/Erreur 404/);
+//        expect(message).toBeTruthy();
+//        console.error = jest.fn()
+//        expect.assertions(1);
+//        try{
+//          mockStore.bills
+//        }catch{
+//          expect (error).toEqual(console.error)
+//        }
+//      });
+
+//     test("Then it should send the new bill to the mock API POST and fails with 500 message error", async () => {
+//       mockStore.bills.mockImplementationOnce(() => {
+//         return {
+//           list : () =>  {
+//             return Promise.reject(new Error("Erreur 500"))
+//           },
+//           create: () =>{
+//             return Promise.reject(new Error("Erreur 500"))
+//           },
+//           update : () =>  {
+//             return Promise.reject(new Error("Erreur 404"))
+//         }
+
+//       }
+//     });
+//       window.onNavigate(ROUTES_PATH.Bills)
+//        await new Promise(process.nextTick);
+//       const html = BillsUI({ error: "Erreur 500" });
+//       document.body.innerHTML = html;
+//       const message = screen.getByText(/Erreur 500/);
+//       expect(message).toBeTruthy();
+//       console.error = jest.fn()
+//        expect.assertions(1);
+//        try{
+//           mockStore.bills
+//        }catch{
+//          expect (error).toEqual(console.error)
+//        }
+//     });
+
+//   });
+// })
+////

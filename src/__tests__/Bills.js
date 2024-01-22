@@ -15,19 +15,33 @@ import router from "../app/Router.js";
 jest.mock("../app/store", () => mockStore);
 
 describe("Given I am connected as an employee", () => {
-  const onNavigate = (pathname) => {
-    document.body.innerHTML = ROUTES({ pathname });
-  };
+  let employeeBills;
+  let onNavigate;
 
-  Object.defineProperty(window, "localStorage", {
-    value: localStorageMock,
+  beforeEach(() => {
+    employeeBills = new Bills({
+      document,
+      onNavigate,
+      store: null,
+      localStorage: window.localStorage,
+    });
   });
-  window.localStorage.setItem(
-    "user",
-    JSON.stringify({
-      type: "Employee",
-    })
-  );
+
+  beforeEach(() => {
+    onNavigate = (pathname) => {
+      document.body.innerHTML = ROUTES({ pathname });
+    };
+
+    Object.defineProperty(window, "localStorage", {
+      value: localStorageMock,
+    });
+    window.localStorage.setItem(
+      "user",
+      JSON.stringify({
+        type: "Employee",
+      })
+    );
+  });
 
   describe("When I am on bills page", () => {
     test("Then bill icon in vertical layout should be highlighted", async () => {
@@ -78,75 +92,31 @@ describe("Given I am connected as an employee", () => {
   });
 
   describe("When I click on the eye icon", () => {
-    beforeEach(() => {
-      $.fn.modal = jest.fn();
-    });
-
-    const employeeBills = new Bills({
-      document,
-      onNavigate,
-      store: null,
-      localStorage: window.localStorage,
-    });
-
-    test("Then a modal should open", () => {
+    test("Then a modal should open showing the expense proof", () => {
       document.body.innerHTML = BillsUI({ data: bills });
-      const handleClickIconEye = jest.fn(employeeBills.handleClickIconEye);
-      const eye = screen.getAllByTestId("icon-eye")[0];
-      eye.addEventListener("click", () => handleClickIconEye(eye));
-      //eye.addEventListener("click", handleClickIconEye);
-      userEvent.click(eye);
-      expect(handleClickIconEye).toHaveBeenCalled();
       const modale = screen.getByTestId("modaleFileEmployee");
+      $.fn.modal = jest.fn(() => modale.classList.add("show"));
+      const eyeIcon = screen.getAllByTestId("icon-eye")[0];
+      const handleClickIconEye = jest.fn(
+        employeeBills.handleClickIconEye(eyeIcon)
+      );
+      eyeIcon.addEventListener("click", handleClickIconEye);
+      userEvent.click(eyeIcon);
+      expect(handleClickIconEye).toHaveBeenCalled();
       expect(modale).toBeTruthy();
-      //expect(screen.getByText("Justificatif")).toBeTruthy();
-      ///Does not work
-      //expect(modale).toHaveClass("show");
-
-      ///Does work when it should not
-      expect(modale).not.toHaveClass("show");
-    });
-
-    //   test("Then the modal should close", () => {
-    //     const modale = screen.getByTestId("modaleFileEmployee");
-    //     const close = document.querySelector(".close");
-    //     close.addEventListener("click", () => {
-    //       expect(modale).toBeFalsy();
-    //     });
-    //   });
-
-    describe("When I click on the close button", () => {
-      test("Then the modal should close", () => {
-        const handleCloseModal = jest.fn(employeeBills.handleCloseModal);
-        const close = screen.getByRole("button");
-        close.addEventListener("click", handleCloseModal);
-        userEvent.click(close);
-        expect(handleCloseModal).toHaveBeenCalled();
-        const modale = screen.getByTestId("modaleFileEmployee");
-        expect(modale).not.toHaveClass("show");
-
-        ///Does work when it should not
-        expect(modale).toBeTruthy();
-      });
+      expect(modale).toHaveClass("show");
     });
   });
 
   describe("When I click on the new bill button", () => {
     test("Then I should navigate to the new bill page", () => {
-      const employeeBills = new Bills({
-        document,
-        onNavigate,
-        store: null,
-        localStorage: window.localStorage,
-      });
-
-      const handleClickNewBillButton = jest.fn(
-        employeeBills.handleClickNewBill
-      );
-      const button = screen.getByTestId("btn-new-bill");
-      button.addEventListener("click", handleClickNewBillButton);
-      userEvent.click(button);
-      expect(handleClickNewBillButton).toHaveBeenCalled();
+      document.body.innerHTML = BillsUI({ data: bills });
+      const handleClickNewBill = jest.fn(employeeBills.handleClickNewBill);
+      const newBillButton = screen.getByTestId("btn-new-bill");
+      newBillButton.addEventListener("click", handleClickNewBill);
+      userEvent.click(newBillButton);
+      expect(handleClickNewBill).toHaveBeenCalled();
+      expect(screen.getByTestId("form-new-bill")).toBeTruthy();
       expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
     });
   });

@@ -22,25 +22,13 @@ const row = (bill) => {
 ///// Ajout pour correction
 
 const rows = (data) => {
-  console.log(data);
-  const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-  return sortedData && sortedData.length
-    ? sortedData.map((bill) => row(bill)).join("")
+  return data && data.length
+    ? data
+        .sort((a, b) => (a.date < b.date ? 1 : -1))
+        .map((bill) => row(bill))
+        .join("")
     : "";
 };
-
-// const rows = (data) => {
-//   return data && data.length
-//     ? data
-//         .sort((a, b) => (a.date > b.date ? 1 : -1))
-//         .map((bill) => {
-//           return row(bill);
-//         })
-//         .join("")
-//     : "";
-// };
-
-///////////
 
 ////// Bug corrigé
 // const rows = (data) => {
