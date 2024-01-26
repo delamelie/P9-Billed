@@ -19,8 +19,6 @@ const row = (bill) => {
     `;
 };
 
-///// Ajout pour correction
-
 const rows = (data) => {
   return data && data.length
     ? data
@@ -30,7 +28,6 @@ const rows = (data) => {
     : "";
 };
 
-////// Bug corrigé
 // const rows = (data) => {
 //   return data && data.length ? data.map((bill) => row(bill)).join("") : "";
 // };

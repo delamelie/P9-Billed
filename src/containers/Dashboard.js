@@ -156,20 +156,17 @@ export default class {
       this.counter++;
     }
 
-    ////Old version
     // bills.forEach((bill) => {
     //   $(`#open-bill${bill.id}`).click((e) =>
     //     this.handleEditTicket(e, bill, bills)
     //   );
     // });
 
-    ////Correct version
     bills.forEach((bill) => {
       $(`#open-bill${bill.id}`)
         .off("click")
         .on("click", (e) => this.handleEditTicket(e, bill, bills));
     });
-    ////
 
     return bills;
   }

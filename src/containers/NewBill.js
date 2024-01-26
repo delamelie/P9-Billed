@@ -33,7 +33,7 @@ export default class NewBill {
     const email = JSON.parse(localStorage.getItem("user")).email;
     formData.append("file", file);
     formData.append("email", email);
-    //Add consition to check file extension
+    //Add condition to check file extension
     if (file.name.match(validFileExtension)) {
       this.store
         .bills()
