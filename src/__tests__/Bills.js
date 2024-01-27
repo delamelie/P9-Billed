@@ -15,23 +15,7 @@ import router from "../app/Router.js";
 jest.mock("../app/store", () => mockStore);
 
 describe("Given I am connected as an employee", () => {
-  let employeeBills;
-  let onNavigate;
-
   beforeEach(() => {
-    employeeBills = new Bills({
-      document,
-      onNavigate,
-      store: null,
-      localStorage: window.localStorage,
-    });
-  });
-
-  beforeEach(() => {
-    onNavigate = (pathname) => {
-      document.body.innerHTML = ROUTES({ pathname });
-    };
-
     Object.defineProperty(window, "localStorage", {
       value: localStorageMock,
     });
@@ -94,6 +78,14 @@ describe("Given I am connected as an employee", () => {
   describe("When I click on the eye icon", () => {
     test("Then a modal should open showing the expense proof", () => {
       document.body.innerHTML = BillsUI({ data: bills });
+
+      const employeeBills = new Bills({
+        document,
+        onNavigate,
+        store: null,
+        localStorage: window.localStorage,
+      });
+
       const modale = screen.getByTestId("modaleFileEmployee");
       $.fn.modal = jest.fn(() => modale.classList.add("show"));
       const eyeIcon = screen.getAllByTestId("icon-eye")[0];
@@ -111,6 +103,18 @@ describe("Given I am connected as an employee", () => {
   describe("When I click on the new bill button", () => {
     test("Then I should navigate to the new bill page", () => {
       document.body.innerHTML = BillsUI({ data: bills });
+
+      onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname });
+      };
+
+      const employeeBills = new Bills({
+        document,
+        onNavigate,
+        store: null,
+        localStorage: window.localStorage,
+      });
+
       const handleClickNewBill = jest.fn(employeeBills.handleClickNewBill);
       const newBillButton = screen.getByTestId("btn-new-bill");
       newBillButton.addEventListener("click", handleClickNewBill);
@@ -136,7 +140,7 @@ describe("Given I am a user connected as an Employee", () => {
       router();
       window.onNavigate(ROUTES_PATH.Bills);
       await waitFor(() => screen.getByText("Mes notes de frais"));
-      const type = await screen.getByText("Type");
+      const type = screen.getByText("Type");
       expect(type).toBeTruthy();
       expect(screen.getAllByTestId("tbody")).toBeTruthy();
     });
